@@ -1,0 +1,8 @@
+[build]
+builder = "NIXPACKS"
+
+[deploy]
+startCommand = "cd out && dotnet neurozen.API.dll"
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10
+
