@@ -151,6 +151,19 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = false,
         ClockSkew = TimeSpan.Zero
     };
+    options.Events = new JwtBearerEvents
+    {
+        OnAuthenticationFailed = context =>
+        {
+            Console.WriteLine($"JWT FAILED: {context.Exception.Message}");
+            return Task.CompletedTask;
+        },
+        OnTokenValidated = context =>
+        {
+            Console.WriteLine("JWT VALIDATED OK");
+            return Task.CompletedTask;
+        }
+    };
 });
 
 // Appointments services
@@ -180,7 +193,7 @@ app.UseHttpsRedirection();
 // Authentication middleware must run before authorization
 app.UseAuthentication();
 // Custom request authorization middleware (validates JWT and sets HttpContext.Items["User"])
-//app.UseRequestAuthorization();
+
 app.UseAuthorization();
 app.MapControllers();
 

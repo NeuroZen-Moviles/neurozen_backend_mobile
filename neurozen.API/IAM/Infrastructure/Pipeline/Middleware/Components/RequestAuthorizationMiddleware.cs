@@ -27,6 +27,8 @@ public class RequestAuthorizationMiddleware(RequestDelegate next)
         ITokenService tokenService)
     {
         Console.WriteLine("Entering InvokeAsync");
+        Console.WriteLine($"IsAuthenticated: {context.User?.Identity?.IsAuthenticated}");
+        Console.WriteLine($"Auth type: {context.User?.Identity?.AuthenticationType}");
         // If there is no endpoint (e.g. static files, probes) skip authorization
         var endpoint = context.GetEndpoint();
         // Respect built-in AllowAnonymousAttribute (and any local derived attribute)
@@ -47,6 +49,11 @@ public class RequestAuthorizationMiddleware(RequestDelegate next)
             // already populated HttpContext.User, use its claims to identify the user.
             if (context.User?.Identity?.IsAuthenticated == true)
             {
+                Console.WriteLine("Claims encontrados:");
+                foreach (var claim in context.User.Claims)
+                {
+                    Console.WriteLine($"  Type: {claim.Type} | Value: {claim.Value}");
+                }
                 var sidClaim = context.User.FindFirst(ClaimTypes.Sid) ?? context.User.FindFirst("sub") ?? context.User.FindFirst(ClaimTypes.NameIdentifier);
                 if (sidClaim != null && int.TryParse(sidClaim.Value, out var userId))
                 {

@@ -32,8 +32,11 @@ public class AuthorizeAttribute : Attribute, IAuthorizationFilter
 
         // verify if a user is signed in by checking if HttpContext.User is set
         var user = (User?)context.HttpContext.Items["User"];
+        if (user != null) return; // autorizado
 
-        // if a user is not signed in, then return 401-status code
-        if (user == null) context.Result = new UnauthorizedResult();
+        if (context.HttpContext.User?.Identity?.IsAuthenticated == true) return; // autorizado
+
+        // Si ninguno, retorna 401
+        context.Result = new UnauthorizedResult();
     }
 }
