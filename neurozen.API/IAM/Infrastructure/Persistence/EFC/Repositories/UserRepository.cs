@@ -27,7 +27,7 @@ public class UserRepository(AppDbContext context) : IUserRepository
     {
         var userEntity = new UserManagement.Domain.Entities.User
         {
-            Id = Guid.NewGuid(),
+            Id = entity.Id,
             Email = entity.Username,
             PasswordHash = entity.PasswordHash,
             FullName = entity.Username,
@@ -47,7 +47,7 @@ public class UserRepository(AppDbContext context) : IUserRepository
      * <param name="id">The user id</param>
      * <returns>The user</returns>
      */
-    public async Task<User?> FindByIdAsync(int id)
+    public async Task<User?> FindByIdAsync(Guid id)
     {
         var userEntity = await Context.Set<UserManagement.Domain.Entities.User>().FindAsync(id);
         if (userEntity == null) return null;

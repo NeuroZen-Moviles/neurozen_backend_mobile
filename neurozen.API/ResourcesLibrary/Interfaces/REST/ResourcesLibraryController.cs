@@ -42,8 +42,8 @@ public class ResourceLibrariesController : ControllerBase
         return CreatedAtAction(nameof(GetResourceLibraryById), new { id = result.Id }, resourceLibraryResource);
     }
 
-    [HttpGet("{id:int}")]
-    public async Task<IActionResult> GetResourceLibraryById(int id)
+    [HttpGet("{id:guid}")]
+    public async Task<IActionResult> GetResourceLibraryById(Guid id)
     {
         String msg = _localizer.GetString("GetResourceLibraryByIdError");
         var result = await _repository.FindByIdAsync(id);

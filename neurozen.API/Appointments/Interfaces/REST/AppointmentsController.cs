@@ -33,11 +33,11 @@ public class AppointmentsController(
     {
         String msg = _localizer.GetString("CreateAppointmentError");
         var createAppointmentCommand = CreateAppointmentCommandFromResourceAssembler.ToCommandFromResource(resource);
-        var result =  await appointmentCommandService.Handle(createAppointmentCommand);
+        var result = await appointmentCommandService.Handle(createAppointmentCommand);
         if (result is null) return BadRequest(new { message = msg });
-        return CreatedAtAction(nameof(GetAppointmentById), new{id = result.Id}, AppointmentResourceFromEntityAssembler.ToResourceFromEntity(result));
+        return CreatedAtAction(nameof(GetAppointmentById), new { id = result.Id }, AppointmentResourceFromEntityAssembler.ToResourceFromEntity(result));
     }
-    
+
     [HttpGet("appointments/{patientId}")]
     [SwaggerOperation(
         Summary = "Get all appointments by patient ID",
@@ -54,14 +54,14 @@ public class AppointmentsController(
         var appointments = result.Select(AppointmentResourceFromEntityAssembler.ToResourceFromEntity);
         return Ok(appointments);
     }
-    
-    [HttpGet("{id}")]
+
+    [HttpGet("{id:guid}")]
     [SwaggerOperation(
         Summary = "Get appointment by ID",
         Description = "Retrieves an appointment by its unique ID.")]
     [SwaggerResponse(200, "Appointment retrieved successfully", typeof(AppointmentResource))]
     [SwaggerResponse(404, "Appointment not found")]
-    public async Task<ActionResult> GetAppointmentById(int id)
+    public async Task<ActionResult> GetAppointmentById(Guid id)
     {
         String msg = _localizer.GetString("GetAppointmentByIdError");
         var getAppointmentByIdQuery = new GetAppointmentByIdQuery(id);
@@ -69,7 +69,7 @@ public class AppointmentsController(
         if (result is null) return NotFound(new { message = msg });
         return Ok(AppointmentResourceFromEntityAssembler.ToResourceFromEntity(result));
     }
-    
+
     [HttpGet("types")]
     [SwaggerOperation(
         Summary = "Get all appointment types",
@@ -78,14 +78,15 @@ public class AppointmentsController(
     public ActionResult GetAppointmentTypes()
     {
         var types = AppointmentType.GetAll()
-            .Select(t => new {
+            .Select(t => new
+            {
                 value = (int)t.Type,
                 name = t.Type.ToString(),
                 displayName = t.DisplayName,
                 description = t.Description,
                 estimatedDurationMinutes = t.EstimatedDurationMinutes
             });
-        
+
         return Ok(types);
     }
 }

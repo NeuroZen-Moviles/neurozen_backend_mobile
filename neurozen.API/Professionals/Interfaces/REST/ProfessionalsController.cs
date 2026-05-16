@@ -50,17 +50,17 @@ public class ProfessionalsController(
 
     var result = await professionalCommandService.Handle(createProfessionalCommand);
 
-    if (result is null) return BadRequest(new { message = msg});
+    if (result is null) return BadRequest(new { message = msg });
     return CreatedAtAction(nameof(GetProfessionalById), new { id = result.Id }, ProfessionalResourceFromEntityAssembler.ToResourceFromEntity(result));
   }
 
-  [HttpGet("{id}")]
+  [HttpGet("{id:guid}")]
   [SwaggerOperation(
         Summary = "Get professional by ID",
         Description = "Retrieves a professional by its unique ID.")]
   [SwaggerResponse(200, "Professional retrieved successfully", typeof(ProfessionalResource))]
   [SwaggerResponse(404, "Professional not found")]
-  public async Task<ActionResult> GetProfessionalById(int id)
+  public async Task<ActionResult> GetProfessionalById(Guid id)
   {
     string msg = _localizer.GetString("GetProfessionalByIdError");
     var getAppointmentByIdQuery = new GetProfessionalByIdQuery(id);

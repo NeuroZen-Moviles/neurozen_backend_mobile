@@ -49,13 +49,8 @@ public class RequestAuthorizationMiddleware(RequestDelegate next)
             // already populated HttpContext.User, use its claims to identify the user.
             if (context.User?.Identity?.IsAuthenticated == true)
             {
-                Console.WriteLine("Claims encontrados:");
-                foreach (var claim in context.User.Claims)
-                {
-                    Console.WriteLine($"  Type: {claim.Type} | Value: {claim.Value}");
-                }
                 var sidClaim = context.User.FindFirst(ClaimTypes.Sid) ?? context.User.FindFirst("sub") ?? context.User.FindFirst(ClaimTypes.NameIdentifier);
-                if (sidClaim != null && int.TryParse(sidClaim.Value, out var userId))
+                if (sidClaim != null && Guid.TryParse(sidClaim.Value, out var userId))
                 {
                     var getUserByIdQuery = new GetUserByIdQuery(userId);
                     var user = await userQueryService.Handle(getUserByIdQuery);
