@@ -7,11 +7,8 @@ public static class ModelBuilderExtensions
 {
     public static void ApplyIamConfiguration(this ModelBuilder builder)
     {
-        // IAM Context
-        
-        builder.Entity<User>().HasKey(u => u.Id);
-        builder.Entity<User>().Property(u => u.Id).IsRequired().ValueGeneratedOnAdd();
-        builder.Entity<User>().Property(u => u.Username).IsRequired();
-        builder.Entity<User>().Property(u => u.PasswordHash).IsRequired();
+        // IAM Context - User entity is configured in UserManagement bounded context
+        // Ignore IAM User entity to avoid conflicts with UserManagement.User mapped to 'users' table
+        builder.Ignore<User>();
     }
 }
