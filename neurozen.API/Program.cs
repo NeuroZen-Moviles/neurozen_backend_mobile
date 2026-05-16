@@ -24,7 +24,7 @@ using neurozen.API.Triggers.Domain.Repositories;
 using neurozen.API.Triggers.Domain.Services;
 using neurozen.API.Triggers.Infraestructure.Respositories;
 using neurozen.API.Subscriptions.Application.Internal.CommandServices;
-using neurozen.API.Subscriptions.Domain.Repositories; 
+using neurozen.API.Subscriptions.Domain.Repositories;
 using neurozen.API.Subscriptions.Domain.Services;
 using neurozen.API.Subscriptions.Infraestructure.Respositories;
 using neurozen.API.Shared.Domain.Repositories;
@@ -43,7 +43,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-builder.Services.AddRouting(options => options.LowercaseUrls = true );
+builder.Services.AddRouting(options => options.LowercaseUrls = true);
 builder.Services.AddEndpointsApiExplorer();
 
 // Add controllers and apply a global authorization filter so every endpoint requires
@@ -129,7 +129,11 @@ builder.Services.AddScoped<IUserQueryService, UserQueryService>();
 var tokenSecret = builder.Configuration["TokenSettings:Secret"] ?? Environment.GetEnvironmentVariable("TokenSettings__Secret");
 if (string.IsNullOrEmpty(tokenSecret))
     throw new Exception("TokenSettings:Secret must be provided via configuration or TokenSettings__Secret env var");
-var key = Encoding.ASCII.GetBytes(tokenSecret);
+byte[] key;
+using (var sha = System.Security.Cryptography.SHA256.Create())
+{
+    key = sha.ComputeHash(Encoding.UTF8.GetBytes(tokenSecret));
+}
 
 builder.Services.AddAuthentication(options =>
 {
@@ -176,7 +180,7 @@ app.UseHttpsRedirection();
 // Authentication middleware must run before authorization
 app.UseAuthentication();
 // Custom request authorization middleware (validates JWT and sets HttpContext.Items["User"])
-app.UseRequestAuthorization();
+//app.UseRequestAuthorization();
 app.UseAuthorization();
 app.MapControllers();
 
