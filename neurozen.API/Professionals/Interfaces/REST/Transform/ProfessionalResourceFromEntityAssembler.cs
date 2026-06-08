@@ -10,7 +10,8 @@ public class ProfessionalResourceFromEntityAssembler
     entity.Name,
     entity.Specialty,
     entity.Experience,
-    entity.Rating,
+    (double)entity.Rating,
+    5, // YearsOfExperience - default value for now
     entity.Reviews,
     entity.Price,
     entity.Availability,

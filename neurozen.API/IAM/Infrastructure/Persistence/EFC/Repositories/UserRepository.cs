@@ -51,7 +51,7 @@ public class UserRepository(AppDbContext context) : IUserRepository
     {
         var userEntity = await Context.Set<UserManagement.Domain.Entities.User>().FindAsync(id);
         if (userEntity == null) return null;
-        return new User(userEntity.Email, userEntity.PasswordHash);
+        return new User(userEntity.Email, userEntity.PasswordHash, userEntity.Email);
     }
 
     /**
@@ -98,7 +98,7 @@ public class UserRepository(AppDbContext context) : IUserRepository
     public async Task<IEnumerable<User>> ListAsync()
     {
         var userEntities = await Context.Set<UserManagement.Domain.Entities.User>().ToListAsync();
-        return userEntities.Select(u => new User(u.Email, u.PasswordHash)).ToList();
+        return userEntities.Select(u => new User(u.Email, u.PasswordHash, u.Email)).ToList();
     }
 
     /**
@@ -115,7 +115,7 @@ public class UserRepository(AppDbContext context) : IUserRepository
 
         if (userEntity == null) return null;
 
-        return new User(userEntity.Email, userEntity.PasswordHash);
+        return new User(userEntity.Email, userEntity.PasswordHash, userEntity.Email);
     }
 
     /**

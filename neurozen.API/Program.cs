@@ -171,6 +171,11 @@ builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
 builder.Services.AddScoped<IAppointmentCommandService, AppointmentCommandService>();
 builder.Services.AddScoped<IAppointmentQueryService, AppointmentQueryService>();
 
+// Professionals services
+builder.Services.AddScoped<neurozen.API.Professionals.Domain.Repositories.IProfessionalRepository, neurozen.API.Professionals.Infrastructure.Repositories.ProfessionalRepository>();
+builder.Services.AddScoped<neurozen.API.Professionals.Domain.Services.IProfessionalCommandService, neurozen.API.Professionals.Application.Internal.CommandServices.ProfessionalCommandService>();
+builder.Services.AddScoped<neurozen.API.Professionals.Domain.Services.IProfessionalQueryService, neurozen.API.Professionals.Application.Internal.QueryServices.ProfessionalQueryService>();
+
 // Triggers services
 builder.Services.AddScoped<ITriggerRepository, TriggerRepository>();
 builder.Services.AddScoped<ITriggerCommandService, TriggerCommandService>();
@@ -178,6 +183,12 @@ builder.Services.AddScoped<ITriggerCommandService, TriggerCommandService>();
 // Subscriptions services
 builder.Services.AddScoped<ISubscriptionRepository, SubcriptionRepository>();
 builder.Services.AddScoped<ISubscriptionCommandService, SubscriptionCommandService>();
+
+// Dashboard services
+builder.Services.AddScoped<neurozen.API.Shared.Application.Internal.QueryServices.DashboardQueryService>();
+
+// Meditation services
+builder.Services.AddScoped<neurozen.API.ResourcesLibrary.Application.Internal.QueryServices.MeditationQueryService>();
 
 var app = builder.Build();
 

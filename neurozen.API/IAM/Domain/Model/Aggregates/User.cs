@@ -10,16 +10,25 @@ namespace neurozen.API.IAM.Domain.Model.Aggregates;
  *     This class is used to represent a user
  * </remarks>
  */
-public class User(string username, string passwordHash)
+public partial class User
 {
-    public User() : this(string.Empty, string.Empty)
+    public User() : this(string.Empty, string.Empty, string.Empty)
     {
     }
 
-    public Guid Id { get; private set; } = Guid.NewGuid();
-    public string Username { get; private set; } = username;
+    public User(string username, string passwordHash, string email)
+    {
+        Username = username;
+        PasswordHash = passwordHash;
+        Email = email;
+    }
 
-    [JsonIgnore] public string PasswordHash { get; private set; } = passwordHash;
+    public Guid Id { get; private set; } = Guid.NewGuid();
+    public string Username { get; private set; }
+
+    [JsonIgnore] public string PasswordHash { get; private set; }
+
+    public string Email { get; private set; }
 
     /**
      * <summary>
