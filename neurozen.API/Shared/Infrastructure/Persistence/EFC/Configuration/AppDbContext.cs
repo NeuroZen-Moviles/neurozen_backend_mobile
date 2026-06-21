@@ -33,10 +33,8 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
         builder.ApplyConfiguration(new UserManagement.Infrastructure.Persistence.EFC.Configuration.AddressConfiguration());
         builder.ApplyConfiguration(new UserManagement.Infrastructure.Persistence.EFC.Configuration.NotificationConfiguration());
 
-        builder.ApplyConfiguration(new Sales.Infrastructure.Persistence.EFC.Configuration.CartConfiguration());
-        builder.ApplyConfiguration(new Sales.Infrastructure.Persistence.EFC.Configuration.CartItemConfiguration());
-        builder.ApplyConfiguration(new Sales.Infrastructure.Persistence.EFC.Configuration.OrderConfiguration());
-        builder.ApplyConfiguration(new Sales.Infrastructure.Persistence.EFC.Configuration.OrderItemConfiguration());
+        
+        
         builder.ApplyConfiguration(new Sales.Infrastructure.Persistence.EFC.Configuration.AppSettingConfiguration());
 
         builder.ApplyConfiguration(new Payments.Infrastructure.Persistence.EFC.Configuration.PaymentConfiguration());
