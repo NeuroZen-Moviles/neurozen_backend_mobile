@@ -5,9 +5,9 @@ namespace neurozen.API.Subscriptions.Interfaces.REST.Transform;
 
 public class CreateSubscriptionCommandFromResourceAssembler
 {
-    public static CreateSubscriptionCommand ToCommandFromResource(CreateSubscriptionResource resource) =>
+    public static CreateSubscriptionCommand ToCommandFromResource(CreateSubscriptionResource resource, Guid userId) =>
         new CreateSubscriptionCommand(
-            resource.UserId,   // 👈 agregado
+            userId,   
             resource.PlanId,
             resource.NameUser,
             resource.LastNameUser,
@@ -15,6 +15,6 @@ public class CreateSubscriptionCommandFromResourceAssembler
             resource.NumberCard,
             resource.ExpirationDate,
             resource.Cvv,
-            resource.IsActive
+            false
         );
 }

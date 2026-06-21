@@ -1,5 +1,4 @@
 ﻿using System.Net.Mime;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using neurozen.API.Resources;
@@ -8,6 +7,7 @@ using neurozen.API.Subscriptions.Domain.Repositories;
 using neurozen.API.Subscriptions.Interfaces.REST.Resources;
 using neurozen.API.Subscriptions.Interfaces.REST.Transform;
 using Swashbuckle.AspNetCore.Annotations;
+using System.Security.Claims;
 
 namespace neurozen.API.Subscriptions.Interfaces;
 
@@ -21,7 +21,6 @@ public class SubscriptionsController(
     IStringLocalizer<SharedResource> _localizer) : ControllerBase
 {
     [HttpPost]
-    [AllowAnonymous]
     [SwaggerOperation(
         Summary = "Creates a subscription",
         Description = "Creates a subscription with given parameters")]
@@ -30,6 +29,12 @@ public class SubscriptionsController(
     public async Task<ActionResult> CreateSubscription([FromBody] CreateSubscriptionResource resource)
     {
         String msgNumberCard = _localizer.GetString("NumberCardError");
+        //Extraimos el userId del usuario loggeado
+        var sidClaim = HttpContext.User.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/sid")?.Value
+               ?? HttpContext.User.FindFirst(ClaimTypes.Sid)?.Value;
+
+        if (string.IsNullOrEmpty(sidClaim) || !Guid.TryParse(sidClaim, out var userId))
+            return Unauthorized(new { message = "No se pudo recuperar un UserId válido desde el token." });
         // 🔹 Validaciones
         if (string.IsNullOrWhiteSpace(resource.NumberCard) || resource.NumberCard.Length != 16 || !resource.NumberCard.All(char.IsDigit))
             return BadRequest(new { message = msgNumberCard });
@@ -51,17 +56,11 @@ public class SubscriptionsController(
             return BadRequest(new { message = msgEmailUser });
 
         String msgSubscriptionActive = _localizer.GetString("SubscriptionActiveError");
-        // 🔹 Validación explícita de IsActive
-        if (resource.IsActive == true)
-            return BadRequest(new { message = msgSubscriptionActive });
-
-        String msgUserId = _localizer.GetString("UserIdError");
-        // 🔹 Validación de UserId
-        if (resource.UserId == Guid.Empty)
-            return BadRequest(new { message = msgUserId });
+        
+        
 
         // 🔹 Crear comando y procesar
-        var createSubscriptionCommand = CreateSubscriptionCommandFromResourceAssembler.ToCommandFromResource(resource);
+        var createSubscriptionCommand = CreateSubscriptionCommandFromResourceAssembler.ToCommandFromResource(resource, userId);
         var result = await subscriptionCommandService.Handle(createSubscriptionCommand);
 
         if (result is null)
