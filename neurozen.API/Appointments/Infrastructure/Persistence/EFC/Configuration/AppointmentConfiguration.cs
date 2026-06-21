@@ -15,15 +15,18 @@ public class AppointmentConfiguration : IEntityTypeConfiguration<Appointment>
         builder.HasKey(a => a.Id);
         builder.Property(a => a.Id)
             .HasColumnName("id")
-            .ValueGeneratedOnAdd();
+            .HasColumnType("char(36)")
+            .ValueGeneratedNever();
 
         // Properties
         builder.Property(a => a.PatientId)
             .HasColumnName("patient_id")
+            .HasColumnType("char(36)")
             .IsRequired();
 
         builder.Property(a => a.ProfessionalId)
             .HasColumnName("professional_id")
+            .HasColumnType("char(36)")
             .IsRequired();
 
         builder.Property(a => a.AppointmentDateTime)

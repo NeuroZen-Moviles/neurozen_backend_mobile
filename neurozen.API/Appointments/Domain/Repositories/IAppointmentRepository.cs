@@ -9,5 +9,7 @@ public interface IAppointmentRepository : IBaseRepository<Appointment>
     ///     Get all appointments by patient id and professional id
     /// </summary>
     /// <returns>An enumerable with all appointments</returns>
-    Task<IEnumerable<Appointment>> GetAllAppointmentsQueryByPatientId(int patientId);
+    Task<IEnumerable<Appointment>> GetAllAppointmentsQueryByPatientId(Guid patientId);
+
+    Task<Appointment?> GetAppointmentById(Guid id);
 }

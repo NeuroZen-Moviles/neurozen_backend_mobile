@@ -7,28 +7,28 @@ namespace neurozen.API.ResourcesLibrary.Domain.Model.Aggregates;
  */
 public class MeditationSession
 {
-    public int Id { get; set; }
-    
+    public Guid Id { get; set; }
+
     public string Title { get; set; } = string.Empty;
-    
+
     public string Description { get; set; } = string.Empty;
-    
+
     public int DurationMinutes { get; set; }
-    
+
     public string ImageUrl { get; set; } = string.Empty;
-    
+
     public string AudioUrl { get; set; } = string.Empty;
-    
+
     public string Category { get; set; } = string.Empty;
-    
+
     public double DifficultyLevel { get; set; }
-    
+
     public int ViewCount { get; set; }
-    
+
     public DateTime CreatedAt { get; set; }
-    
+
     public MeditationSession() { }
-    
+
     public MeditationSession(string title, string description, int durationMinutes, string category, double difficultyLevel)
     {
         Title = title;

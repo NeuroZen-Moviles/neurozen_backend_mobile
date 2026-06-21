@@ -15,7 +15,8 @@ public class ResourceLibraryConfiguration : IEntityTypeConfiguration<ResourceLib
         builder.HasKey(rl => rl.Id);
         builder.Property(rl => rl.Id)
             .HasColumnName("id")
-            .ValueGeneratedOnAdd();
+            .HasColumnType("char(36)")
+            .ValueGeneratedNever();
 
         // Properties
         builder.Property(rl => rl.Title)

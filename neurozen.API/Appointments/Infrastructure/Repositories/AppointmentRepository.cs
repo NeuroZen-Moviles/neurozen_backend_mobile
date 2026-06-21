@@ -9,10 +9,16 @@ namespace neurozen.API.Appointments.Infrastructure.Repositories;
 
 public class AppointmentRepository(AppDbContext context) : BaseRepository<Appointment>(context), IAppointmentRepository
 {
-    public async Task<IEnumerable<Appointment>> GetAllAppointmentsQueryByPatientId(int patientId)
+    public async Task<IEnumerable<Appointment>> GetAllAppointmentsQueryByPatientId(Guid patientId)
     {
         return await context.Set<Appointment>()
             .Where(a => a.PatientId == patientId)
             .ToListAsync();
+    }
+
+    public async Task<Appointment?> GetAppointmentById(Guid id)
+    {
+        return await context.Set<Appointment>()
+            .FirstOrDefaultAsync(p => p.Id == id);
     }
 }

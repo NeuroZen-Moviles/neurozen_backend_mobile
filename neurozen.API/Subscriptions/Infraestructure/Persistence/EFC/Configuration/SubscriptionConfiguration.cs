@@ -10,51 +10,53 @@ public class SubscriptionConfiguration : IEntityTypeConfiguration<Subscription>
     {
         // Table name
         builder.ToTable("Subscriptions");
-        
+
         // Primary Key
         builder.HasKey(s => s.Id);
         builder.Property(s => s.Id)
             .HasColumnName("Id")
-            .ValueGeneratedOnAdd();
-        
+            .HasColumnType("char(36)")
+            .ValueGeneratedNever();
+
         // Properties
         builder.Property(t => t.UserId)
             .IsRequired()
-            .HasColumnName("UserId");
-        
+            .HasColumnName("UserId")
+            .HasColumnType("char(36)");
+
         builder.Property(t => t.PlanId)
             .IsRequired()
             .HasColumnName("PlanId");
-        
+
         builder.Property(t => t.NameUser)
             .IsRequired()
             .HasColumnName("NameUser");
-        
+
         builder.Property(t => t.LastNameUser)
             .IsRequired()
             .HasColumnName("LastNameUser");
-        
+
         builder.Property(t => t.EmailUser)
             .IsRequired()
             .HasColumnName("EmailUser");
-        
+
         builder.Property(t => t.NumberCard)
             .IsRequired()
             .HasColumnName("NumberCard");
-        
+
         builder.Property(t => t.ExpirationDate)
             .IsRequired()
             .HasColumnName("ExpirationDate");
-        
+
         builder.Property(t => t.Cvv)
             .IsRequired()
             .HasColumnName("Cvv");
-        
+
         // 👇 Nueva propiedad opcional
         builder.Property(t => t.IsActive)
             .HasColumnName("IsActive")
             .HasDefaultValue(true); // puedes poner false o null según tu lógica
-        
+
         // Indexes for better performance
         builder.HasIndex(t => t.UserId).HasDatabaseName("IX_Subscription_UserId");
         builder.HasIndex(t => t.PlanId).HasDatabaseName("IX_Subscription_PlanId");

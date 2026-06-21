@@ -45,6 +45,7 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 builder.Services.AddEndpointsApiExplorer();
+System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
 // Add controllers and apply a global authorization filter so every endpoint requires
 // authorization by default. Controllers/actions decorated with [AllowAnonymous]
@@ -203,6 +204,7 @@ app.UseRequestLocalization(LocalizationOptions);
 app.UseHttpsRedirection();
 // Authentication middleware must run before authorization
 app.UseAuthentication();
+app.UseRequestAuthorization();
 // Custom request authorization middleware (validates JWT and sets HttpContext.Items["User"])
 
 app.UseAuthorization();

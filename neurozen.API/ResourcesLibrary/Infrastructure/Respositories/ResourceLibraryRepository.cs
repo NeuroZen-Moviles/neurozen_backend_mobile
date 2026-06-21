@@ -16,7 +16,7 @@ public class ResourceLibraryRepository(AppDbContext context)
             .ToListAsync();
     }
 
-    public async Task<ResourceLibrary?> GetByIdAsync(int id)
+    public async Task<ResourceLibrary?> GetByIdAsync(Guid id)
     {
         return await Context.Set<ResourceLibrary>()
             .FirstOrDefaultAsync(r => r.Id == id);

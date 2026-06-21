@@ -52,16 +52,14 @@ public class RequestAuthorizationMiddleware(RequestDelegate next)
                 var sidClaim = context.User.FindFirst(ClaimTypes.Sid) ?? context.User.FindFirst("sub") ?? context.User.FindFirst(ClaimTypes.NameIdentifier);
                 if (sidClaim != null && Guid.TryParse(sidClaim.Value, out var userId))
                 {
-                    var getUserByIdQuery = new GetUserByIdQuery(userId);
-                    var user = await userQueryService.Handle(getUserByIdQuery);
-                    if (user != null)
+                    if (context.User.Identity is ClaimsIdentity identity)
                     {
-                        context.Items["User"] = user;
-                        Console.WriteLine("User set from authenticated principal.");
+                        identity.AddClaim(new Claim(ClaimTypes.Sid, userId.ToString()));
+                        context.Items["UserId"] = userId;
+                        Console.WriteLine("User authenticated from principal.");
                         await next(context);
                         return;
                     }
-                    // fallthrough to unauthorized if user not found
                 }
                 // fallthrough to try tokenService validation as a fallback
             }
@@ -84,27 +82,14 @@ public class RequestAuthorizationMiddleware(RequestDelegate next)
                 return;
             }
 
-            var getUserByIdQuery2 = new GetUserByIdQuery(validatedUserId.Value);
-            var validatedUser = await userQueryService.Handle(getUserByIdQuery2);
-            if (validatedUser == null)
-            {
-                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                await context.Response.WriteAsync("Unauthorized: user not found");
-                return;
-            }
-
-            context.Items["User"] = validatedUser;
             // ensure HttpContext.User is populated so Authorize attribute sees an authenticated principal
-            if (context.User?.Identity?.IsAuthenticated != true)
+            var claims = new List<Claim>
             {
-                var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Sid, validatedUser.Id.ToString()),
-                    new Claim(ClaimTypes.Name, validatedUser.Username)
-                };
-                var identity = new ClaimsIdentity(claims, JwtBearerDefaults.AuthenticationScheme);
-                context.User = new ClaimsPrincipal(identity);
-            }
+                new Claim(ClaimTypes.Sid, validatedUserId.Value.ToString())
+            };
+            var fallbackIdentity = new ClaimsIdentity(claims, JwtBearerDefaults.AuthenticationScheme);
+            context.User = new ClaimsPrincipal(fallbackIdentity);
+            context.Items["UserId"] = validatedUserId.Value;
 
             Console.WriteLine("Continuing with Middleware Pipeline");
             await next(context);

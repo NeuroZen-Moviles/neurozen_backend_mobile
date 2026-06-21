@@ -28,7 +28,8 @@ public class UserRepository(AppDbContext context) : IUserRepository
         var userEntity = new UserManagement.Domain.Entities.User
         {
             Id = entity.Id,
-            Email = entity.Username,
+            Username = entity.Username,
+            Email = entity.Email,
             PasswordHash = entity.PasswordHash,
             FullName = entity.Username,
             Role = "user",
@@ -39,6 +40,7 @@ public class UserRepository(AppDbContext context) : IUserRepository
         };
         await Context.Set<UserManagement.Domain.Entities.User>().AddAsync(userEntity);
     }
+
 
     /**
      * <summary>
@@ -51,8 +53,9 @@ public class UserRepository(AppDbContext context) : IUserRepository
     {
         var userEntity = await Context.Set<UserManagement.Domain.Entities.User>().FindAsync(id);
         if (userEntity == null) return null;
-        return new User(userEntity.Email, userEntity.PasswordHash, userEntity.Email);
+        return new User(userEntity.Username, userEntity.PasswordHash!, userEntity.Email);
     }
+
 
     /**
      * <summary>
@@ -63,14 +66,16 @@ public class UserRepository(AppDbContext context) : IUserRepository
     public void Update(User entity)
     {
         var userEntity = Context.Set<UserManagement.Domain.Entities.User>()
-            .FirstOrDefault(u => u.Email.Equals(entity.Username));
+            .FirstOrDefault(u => u.Username.Equals(entity.Username));
 
         if (userEntity != null)
         {
             userEntity.PasswordHash = entity.PasswordHash;
+            userEntity.Email = entity.Email;
             Context.Set<UserManagement.Domain.Entities.User>().Update(userEntity);
         }
     }
+
 
     /**
      * <summary>
@@ -81,13 +86,14 @@ public class UserRepository(AppDbContext context) : IUserRepository
     public void Remove(User entity)
     {
         var userEntity = Context.Set<UserManagement.Domain.Entities.User>()
-            .FirstOrDefault(u => u.Email.Equals(entity.Username));
+            .FirstOrDefault(u => u.Username.Equals(entity.Username));
 
         if (userEntity != null)
         {
             Context.Set<UserManagement.Domain.Entities.User>().Remove(userEntity);
         }
     }
+
 
     /**
      * <summary>
@@ -98,8 +104,9 @@ public class UserRepository(AppDbContext context) : IUserRepository
     public async Task<IEnumerable<User>> ListAsync()
     {
         var userEntities = await Context.Set<UserManagement.Domain.Entities.User>().ToListAsync();
-        return userEntities.Select(u => new User(u.Email, u.PasswordHash, u.Email)).ToList();
+        return userEntities.Select(u => new User(u.Username, u.PasswordHash!, u.Email)).ToList();
     }
+
 
     /**
      * <summary>
@@ -111,12 +118,13 @@ public class UserRepository(AppDbContext context) : IUserRepository
     public async Task<User?> FindByUsernameAsync(string username)
     {
         var userEntity = await Context.Set<UserManagement.Domain.Entities.User>()
-            .FirstOrDefaultAsync(user => user.Email.Equals(username));
+            .FirstOrDefaultAsync(user => user.Username.Equals(username));
 
         if (userEntity == null) return null;
 
-        return new User(userEntity.Email, userEntity.PasswordHash, userEntity.Email);
+        return new User(userEntity.Username, userEntity.PasswordHash!, userEntity.Email);
     }
+
 
     /**
      * <summary>
@@ -127,6 +135,7 @@ public class UserRepository(AppDbContext context) : IUserRepository
      */
     public bool ExistsByUsername(string username)
     {
-        return Context.Set<UserManagement.Domain.Entities.User>().Any(user => user.Email.Equals(username));
+        return Context.Set<UserManagement.Domain.Entities.User>().Any(user => user.Username.Equals(username));
     }
+
 }

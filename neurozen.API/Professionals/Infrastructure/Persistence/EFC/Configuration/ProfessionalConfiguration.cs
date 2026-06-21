@@ -14,7 +14,8 @@ public class ProfessionalConfiguration : IEntityTypeConfiguration<Professional>
         builder.HasKey(p => p.Id);
         builder.Property(p => p.Id)
             .HasColumnName("Id")
-            .ValueGeneratedOnAdd();
+            .HasColumnType("char(36)")
+            .ValueGeneratedNever();
 
         // Name
         builder.Property(p => p.Name)

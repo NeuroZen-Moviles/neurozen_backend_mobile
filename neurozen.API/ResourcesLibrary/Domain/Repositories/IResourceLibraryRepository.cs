@@ -7,5 +7,5 @@ public interface IResourceLibraryRepository : IBaseRepository<ResourceLibrary>
 {
     // Métodos específicos si los necesitas
     Task<IEnumerable<ResourceLibrary>> GetByResourceTypeAsync(string resourceType);
-    Task<ResourceLibrary?> GetByIdAsync(int id);
+    Task<ResourceLibrary?> GetByIdAsync(Guid id);
 }

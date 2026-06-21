@@ -21,22 +21,23 @@ public class AuthorizeAttribute : Attribute, IAuthorizationFilter
      * <param name="context">The authorization filter context</param>
      */
     public void OnAuthorization(AuthorizationFilterContext context)
+{
+    var allowAnonymous = context.ActionDescriptor.EndpointMetadata.OfType<AllowAnonymousAttribute>().Any();
+
+    if (allowAnonymous)
     {
-        var allowAnonymous = context.ActionDescriptor.EndpointMetadata.OfType<AllowAnonymousAttribute>().Any();
+        Console.WriteLine(" Skipping authorization");
+        return;
+    }
 
-        if (allowAnonymous)
-        {
-            Console.WriteLine(" Skipping authorization");
-            return;
-        }
+    // 1. Prioridad al Middleware: Si UseRequestAuthorization ya validó al usuario y lo metió en Items
+    var user = (User?)context.HttpContext.Items["User"];
+    if (user != null) return; // Autorizado
 
-        // verify if a user is signed in by checking if HttpContext.User is set
-        var user = (User?)context.HttpContext.Items["User"];
-        if (user != null) return; // autorizado
+    // 2. Respaldo: Si no está en Items pero la identidad nativa de .NET dice que está autenticado
+    if (context.HttpContext.User?.Identity?.IsAuthenticated == true) return; // Autorizado
 
-        if (context.HttpContext.User?.Identity?.IsAuthenticated == true) return; // autorizado
-
-        // Si ninguno, retorna 401
-        context.Result = new UnauthorizedResult();
+    // 3. Si no pasó ninguna de las dos barreras, se bloquea con 401
+    context.Result = new UnauthorizedResult();
     }
 }

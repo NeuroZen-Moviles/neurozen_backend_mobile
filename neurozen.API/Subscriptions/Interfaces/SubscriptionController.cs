@@ -33,11 +33,11 @@ public class SubscriptionsController(
         // 🔹 Validaciones
         if (string.IsNullOrWhiteSpace(resource.NumberCard) || resource.NumberCard.Length != 16 || !resource.NumberCard.All(char.IsDigit))
             return BadRequest(new { message = msgNumberCard });
-        
+
         String msgPlanId = _localizer.GetString("PlanIdError");
         if (resource.PlanId is < 1 or > 3)
             return BadRequest(new { message = msgPlanId });
-        
+
         String msgCvv = _localizer.GetString("CvvError");
         if (string.IsNullOrWhiteSpace(resource.Cvv) || resource.Cvv.Length != 3 || !resource.Cvv.All(char.IsDigit))
             return BadRequest(new { message = msgCvv });
@@ -45,19 +45,19 @@ public class SubscriptionsController(
         String msgExpirationDate = _localizer.GetString("ExpirationDateError");
         if (string.IsNullOrWhiteSpace(resource.ExpirationDate) || resource.ExpirationDate.Length != 5)
             return BadRequest(new { message = msgExpirationDate });
-        
+
         String msgEmailUser = _localizer.GetString("EmailUserError");
         if (string.IsNullOrWhiteSpace(resource.EmailUser) || !resource.EmailUser.EndsWith("@gmail.com"))
             return BadRequest(new { message = msgEmailUser });
-        
+
         String msgSubscriptionActive = _localizer.GetString("SubscriptionActiveError");
         // 🔹 Validación explícita de IsActive
         if (resource.IsActive == true)
             return BadRequest(new { message = msgSubscriptionActive });
-        
+
         String msgUserId = _localizer.GetString("UserIdError");
         // 🔹 Validación de UserId
-        if (resource.UserId <= 0)
+        if (resource.UserId == Guid.Empty)
             return BadRequest(new { message = msgUserId });
 
         // 🔹 Crear comando y procesar
@@ -71,8 +71,8 @@ public class SubscriptionsController(
         }
 
         return CreatedAtAction(
-            nameof(CreateSubscription), 
-            new { id = result.Id }, 
+            nameof(CreateSubscription),
+            new { id = result.Id },
             SubscriptionResourceFromEntityAssembler.ToResourceFromEntity(result)
         );
     }
@@ -87,7 +87,7 @@ public class SubscriptionsController(
         String msg = _localizer.GetString("GetSubscriptionsByPlanIdError");
         var subscriptions = await subscriptionRepository.FindByPlanIdAsync(planId);
         if (!subscriptions.Any())
-            return NotFound(new { message = msg});
+            return NotFound(new { message = msg });
 
         return Ok(subscriptions.Select(SubscriptionResourceFromEntityAssembler.ToResourceFromEntity));
     }
@@ -102,7 +102,7 @@ public class SubscriptionsController(
         String msg = _localizer.GetString("GetSubscriptionsByIsActiveError");
         var subscriptions = await subscriptionRepository.FindByIsActiveAsync(isActive);
         if (!subscriptions.Any())
-            return NotFound(new { message = msg});
+            return NotFound(new { message = msg });
 
         return Ok(subscriptions.Select(SubscriptionResourceFromEntityAssembler.ToResourceFromEntity));
     }
@@ -112,7 +112,7 @@ public class SubscriptionsController(
     [SwaggerOperation(Summary = "Get subscriptions by UserId")]
     [SwaggerResponse(200, "Subscriptions found", typeof(IEnumerable<SubscriptionResource>))]
     [SwaggerResponse(404, "No subscriptions found for given UserId")]
-    public async Task<ActionResult<IEnumerable<SubscriptionResource>>> GetByUserId(int userId)
+    public async Task<ActionResult<IEnumerable<SubscriptionResource>>> GetByUserId(Guid userId)
     {
         String msg = _localizer.GetString("GetSubscriptionsByUserIdError");
         var subscriptions = await subscriptionRepository.FindByUserIdAsync(userId);

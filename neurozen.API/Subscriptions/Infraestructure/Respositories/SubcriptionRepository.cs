@@ -6,16 +6,9 @@ using neurozen.API.Subscriptions.Domain.Repositories;
 
 namespace neurozen.API.Subscriptions.Infraestructure.Respositories;
 
-public class SubcriptionRepository(AppDbContext context) 
+public class SubcriptionRepository(AppDbContext context)
     : BaseRepository<Subscription>(context), ISubscriptionRepository
 {
-    // Obtener una suscripción por Id
-    public async Task<Subscription?> FindByIdAsync(int id)
-    {
-        return await context.Set<Subscription>()
-            .FirstOrDefaultAsync(s => s.Id == id);
-    }
-
     // Obtener todas las suscripciones de un Plan específico
     public async Task<IEnumerable<Subscription>> FindByPlanIdAsync(int planId)
     {
@@ -33,15 +26,15 @@ public class SubcriptionRepository(AppDbContext context)
     }
 
     // Obtener todas las suscripciones de un usuario específico
-    public async Task<IEnumerable<Subscription>> FindByUserIdAsync(int userId)
+    public async Task<IEnumerable<Subscription>> FindByUserIdAsync(Guid userId)
     {
         return await context.Set<Subscription>()
             .Where(s => s.UserId == userId)
             .ToListAsync();
     }
-    
+
     // Verificar si un usuario tiene una suscripción activa
-    public async Task<Subscription?> FindActiveSubscriptionByUserIdAsync(int userId)
+    public async Task<Subscription?> FindActiveSubscriptionByUserIdAsync(Guid userId)
     {
         return await context.Set<Subscription>()
             .FirstOrDefaultAsync(s => s.UserId == userId && s.IsActive == true);

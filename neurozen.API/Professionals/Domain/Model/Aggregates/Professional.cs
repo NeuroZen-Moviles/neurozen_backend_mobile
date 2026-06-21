@@ -38,7 +38,7 @@ public partial class Professional
         Image = command.Image;
     }
 
-    public int Id { get; private set; }
+    public Guid Id { get; private set; } = Guid.NewGuid();
     public string Name { get; private set; } = string.Empty;
     public string Specialty { get; private set; } = string.Empty;
     public string Experience { get; private set; } = string.Empty;

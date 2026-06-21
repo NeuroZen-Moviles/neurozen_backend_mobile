@@ -3,5 +3,5 @@
 namespace neurozen.API.Appointments.Interfaces.REST.Resources;
 
 public record AppointmentResource(
-    int Id, long PatientId, long ProfessionalId, DateTime AppointmentDateTime
-    ,EAppointmentType AppointmentType, string notasAdicionales );
+    Guid Id, Guid PatientId, Guid ProfessionalId, DateTime AppointmentDateTime
+    , EAppointmentType AppointmentType, string notasAdicionales);

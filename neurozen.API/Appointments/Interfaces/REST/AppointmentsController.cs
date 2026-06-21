@@ -5,10 +5,14 @@ using neurozen.API.Appointments.Domain.Model.Commands;
 using Swashbuckle.AspNetCore.Annotations;
 using neurozen.API.Appointments.Domain.Model.Queries;
 using neurozen.API.Appointments.Domain.Services;
+using neurozen.API.IAM.Domain.Model.Aggregates;
 using neurozen.API.Appointments.Interfaces.REST.Resources;
 using neurozen.API.Appointments.Interfaces.REST.Transform;
 using neurozen.API.Appointments.Domain.Model.ValueObjects;
 using neurozen.API.Resources;
+using System.Security.Claims;
+using neurozen.API.IAM.Domain.Services;
+using neurozen.API.IAM.Domain.Model.Queries;
 
 namespace neurozen.API.Appointments.Interfaces.REST;
 
@@ -20,6 +24,7 @@ namespace neurozen.API.Appointments.Interfaces.REST;
 public class AppointmentsController(
     IAppointmentCommandService appointmentCommandService,
     IAppointmentQueryService appointmentQueryService,
+    IUserQueryService userQueryService,
     IStringLocalizer<SharedResource> _localizer) : ControllerBase
 {
     [HttpPost]
@@ -32,20 +37,36 @@ public class AppointmentsController(
     public async Task<ActionResult> CreateAppointment([FromBody] CreateAppointmentResource resource)
     {
         String msg = _localizer.GetString("CreateAppointmentError");
-        var createAppointmentCommand = CreateAppointmentCommandFromResourceAssembler.ToCommandFromResource(resource);
+
+        // 1. Extraemos directamente el valor usando la URL larga exacta que vimos en tu consola
+    var sidClaim = HttpContext.User.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/sid")?.Value
+                   ?? HttpContext.User.FindFirst(ClaimTypes.Sid)?.Value;
+
+    // 2. Si no lo encuentra, validamos contra nulos
+    if (string.IsNullOrEmpty(sidClaim) || !Guid.TryParse(sidClaim, out var patientId))
+    {
+        return Unauthorized(new { message = "No se pudo recuperar un GUID de paciente válido desde los reclamos de seguridad." });
+    }
+
+        if (resource.ProfessionalId == Guid.Empty)
+            return BadRequest(new { message = "ProfessionalId must not be empty" });
+
+        var createAppointmentCommand = CreateAppointmentCommandFromResourceAssembler.ToCommandFromResource(resource, patientId);
         var result = await appointmentCommandService.Handle(createAppointmentCommand);
+
         if (result is null) return BadRequest(new { message = msg });
+
         return CreatedAtAction(nameof(GetAppointmentById), new { id = result.Id }, AppointmentResourceFromEntityAssembler.ToResourceFromEntity(result));
     }
 
-    [HttpGet("appointments/{patientId}")]
+    [HttpGet("appointments/{patientId:guid}")]
     [SwaggerOperation(
         Summary = "Get all appointments by patient ID",
         Description = "Retrieves all appointments associated with a specific patient ID."
     )]
     [SwaggerResponse(200, "Appointments retrieved successfully", typeof(IEnumerable<AppointmentResource>))]
     [SwaggerResponse(400, "Appointments retrieval failed")]
-    public async Task<ActionResult<IEnumerable<AppointmentResource>>> GetAllAppointmentsByPatientIdAsync(int patientId)
+    public async Task<ActionResult<IEnumerable<AppointmentResource>>> GetAllAppointmentsByPatientIdAsync(Guid patientId)
     {
         String msg = _localizer.GetString("GetAppointmentsbyPatientIdError");
         var getAllAppointmentsByPatientIdQuery = new GetAllAppointmentsQueryByPatientId(patientId);
@@ -88,5 +109,23 @@ public class AppointmentsController(
             });
 
         return Ok(types);
+    }
+
+    private bool TryGetAuthenticatedUserId(out Guid userId)
+    {
+        userId = Guid.Empty;
+        
+        if (HttpContext.Items["User"] is User user && user.Id != Guid.Empty)
+        {
+            userId = user.Id;
+            return true;
+        }
+
+        var sidClaim = HttpContext.User.FindFirst(ClaimTypes.Sid)
+            //?? HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)
+            ?? HttpContext.User.FindFirst("sid");
+            //?? HttpContext.User.FindFirst("sub");
+
+        return sidClaim != null && Guid.TryParse(sidClaim.Value, out userId);
     }
 }

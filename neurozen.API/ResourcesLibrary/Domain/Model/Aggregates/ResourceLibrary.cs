@@ -4,7 +4,7 @@ namespace neurozen.API.ResourcesLibrary.Domain.Model.Aggregates;
 
 public partial class ResourceLibrary
 {
-    protected  ResourceLibrary()
+    protected ResourceLibrary()
     {
         Title = string.Empty;
         Description = string.Empty;
@@ -22,8 +22,8 @@ public partial class ResourceLibrary
         Duration = command.Duration;
         Author = command.Author;
     }
-    
-    public int Id { get; private set; }
+
+    public Guid Id { get; private set; } = Guid.NewGuid();
     public string Title { get; private set; }
     public string Description { get; private set; }
     public string ResourceType { get; private set; } // "Book", "Video", "Audio", "Exercise"

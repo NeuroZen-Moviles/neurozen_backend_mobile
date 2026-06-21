@@ -3,8 +3,8 @@
 namespace neurozen.API.Appointments.Domain.Model.Commands;
 
 public record CreateAppointmentCommand(
-    int PatientId, 
-    int ProfessionalId, 
+    Guid PatientId,
+    Guid ProfessionalId,
     DateTime AppointmentDate,
     EAppointmentType AppointmentType,
     string? NotasAdicionales = null);

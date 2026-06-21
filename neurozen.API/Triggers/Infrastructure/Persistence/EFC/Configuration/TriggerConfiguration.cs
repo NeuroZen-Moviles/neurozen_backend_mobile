@@ -15,7 +15,8 @@ public class TriggerConfiguration : IEntityTypeConfiguration<Trigger>
         builder.HasKey(t => t.Id);
         builder.Property(t => t.Id)
             .HasColumnName("id")
-            .ValueGeneratedOnAdd();
+            .HasColumnType("char(36)")
+            .ValueGeneratedNever();
 
         // Properties
         builder.Property(t => t.PatientId)

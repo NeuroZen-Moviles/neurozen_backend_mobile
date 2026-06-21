@@ -1,7 +1,7 @@
 ﻿namespace neurozen.API.ResourcesLibrary.Interfaces.REST.Resources;
 
 public record ResourceLibraryResource(
-    int Id,
+    Guid Id,
     string Title,
     string Description,
     string ResourceType,

@@ -5,10 +5,10 @@ namespace neurozen.API.Appointments.Interfaces.REST.Transform;
 
 public class CreateAppointmentCommandFromResourceAssembler
 {
-    public static CreateAppointmentCommand ToCommandFromResource(CreateAppointmentResource resource) =>
+    public static CreateAppointmentCommand ToCommandFromResource(CreateAppointmentResource resource, Guid patientId) =>
         new CreateAppointmentCommand(
-            resource.PatientId, 
-            resource.ProfessionalId, 
+            patientId,
+            resource.ProfessionalId,
             resource.AppointmentDateTime,
             resource.AppointmentType,
             resource.NotasAdicionales);
