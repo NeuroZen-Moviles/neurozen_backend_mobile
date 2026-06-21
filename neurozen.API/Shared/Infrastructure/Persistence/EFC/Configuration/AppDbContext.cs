@@ -25,8 +25,8 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
         // This approach avoids applying duplicate configurations from Shared namespace.
         // Each bounded context manages its own entities: Catalog, UserManagement, Sales, and Payments.
         builder.ApplyConfiguration(new Catalog.Infrastructure.Persistence.EFC.Configuration.CategoryConfiguration());
-        builder.ApplyConfiguration(new Catalog.Infrastructure.Persistence.EFC.Configuration.ProductConfiguration());
-        builder.ApplyConfiguration(new Catalog.Infrastructure.Persistence.EFC.Configuration.ProductImageConfiguration());
+        //builder.ApplyConfiguration(new Catalog.Infrastructure.Persistence.EFC.Configuration.ProductConfiguration());
+        //builder.ApplyConfiguration(new Catalog.Infrastructure.Persistence.EFC.Configuration.ProductImageConfiguration());
 
         builder.ApplyConfiguration(new UserManagement.Infrastructure.Persistence.EFC.Configuration.UserConfiguration());
         builder.ApplyConfiguration(new UserManagement.Infrastructure.Persistence.EFC.Configuration.SessionConfiguration());
@@ -36,6 +36,8 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
         
         
         builder.ApplyConfiguration(new Sales.Infrastructure.Persistence.EFC.Configuration.AppSettingConfiguration());
+
+        builder.ApplyConfiguration(new Subscriptions.Infraestructure.Persistence.EFC.Configuration.SubscriptionConfiguration());
 
         builder.ApplyConfiguration(new Payments.Infrastructure.Persistence.EFC.Configuration.PaymentConfiguration());
 

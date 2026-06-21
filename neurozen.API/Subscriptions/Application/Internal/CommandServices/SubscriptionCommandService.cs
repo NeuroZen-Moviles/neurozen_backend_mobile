@@ -3,10 +3,15 @@ using neurozen.API.Subscriptions.Domain.Model.Aggregates;
 using neurozen.API.Subscriptions.Domain.Model.Commands;
 using neurozen.API.Subscriptions.Domain.Repositories;
 using neurozen.API.Subscriptions.Domain.Services;
+using neurozen.API.Payments.Domain.Entities;
+using neurozen.API.Payments.Domain.Repositories;
 
 namespace neurozen.API.Subscriptions.Application.Internal.CommandServices;
 
-public class SubscriptionCommandService (ISubscriptionRepository subscriptionRepository, IUnitOfWork unitOfWork, ILogger<SubscriptionCommandService> logger) : ISubscriptionCommandService
+public class SubscriptionCommandService (ISubscriptionRepository subscriptionRepository,
+    IPaymentRepository paymentRepository,
+    IUnitOfWork unitOfWork, 
+    ILogger<SubscriptionCommandService> logger) : ISubscriptionCommandService
 {
     public async Task<Subscription?> Handle(CreateSubscriptionCommand command)
     {
@@ -32,6 +37,25 @@ public class SubscriptionCommandService (ISubscriptionRepository subscriptionRep
             // ✅ PASO 4: Activar la suscripción después de guardarla exitosamente
             subscription.Activate();
             subscriptionRepository.Update(subscription);
+            await unitOfWork.CompleteAsync();
+
+            //Creamos el payment tras la suscripción:
+            var amount = command.PlanId switch{1 => 19.90m, 2 => 39.39m, 3=>59.90m, _ => 0};
+            var last4 = command.NumberCard.Length >= 4 ? command.NumberCard[^4..] : command.NumberCard;
+
+            var payment = new Payment
+            {
+                Id = Guid.NewGuid(),
+                UserId = command.UserId,
+                SubscriptionId = subscription.Id,
+                PlanId = command.PlanId,
+                Amount = amount,
+                Currency = "PEN",
+                Status = "exitoso",
+                CardLast4 = last4
+            };
+
+            await paymentRepository.AddAsync(payment);
             await unitOfWork.CompleteAsync();
             
             logger.LogInformation("Subscription created and activated successfully for user {UserId}. Subscription ID: {SubscriptionId}", 
