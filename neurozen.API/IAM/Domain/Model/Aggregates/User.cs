@@ -23,6 +23,12 @@ public partial class User
         Email = email;
     }
 
+    public User(Guid id, string username, string passwordHash, string email)
+    : this(username, passwordHash, email)
+    {
+    Id = id;
+    }
+
     public Guid Id { get; private set; } = Guid.NewGuid();
     public string Username { get; private set; }
 

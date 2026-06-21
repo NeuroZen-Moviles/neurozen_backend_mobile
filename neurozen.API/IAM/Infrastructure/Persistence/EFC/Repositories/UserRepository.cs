@@ -53,7 +53,7 @@ public class UserRepository(AppDbContext context) : IUserRepository
     {
         var userEntity = await Context.Set<UserManagement.Domain.Entities.User>().FindAsync(id);
         if (userEntity == null) return null;
-        return new User(userEntity.Username, userEntity.PasswordHash!, userEntity.Email);
+        return new User(userEntity.Id, userEntity.Username, userEntity.PasswordHash!, userEntity.Email);
     }
 
 
@@ -104,7 +104,7 @@ public class UserRepository(AppDbContext context) : IUserRepository
     public async Task<IEnumerable<User>> ListAsync()
     {
         var userEntities = await Context.Set<UserManagement.Domain.Entities.User>().ToListAsync();
-        return userEntities.Select(u => new User(u.Username, u.PasswordHash!, u.Email)).ToList();
+        return userEntities.Select(u => new User(u.Id, u.Username, u.PasswordHash!, u.Email)).ToList();
     }
 
 
@@ -122,7 +122,7 @@ public class UserRepository(AppDbContext context) : IUserRepository
 
         if (userEntity == null) return null;
 
-        return new User(userEntity.Username, userEntity.PasswordHash!, userEntity.Email);
+        return new User(userEntity.Id, userEntity.Username, userEntity.PasswordHash!, userEntity.Email);
     }
 
 
