@@ -70,4 +70,30 @@ public class SubscriptionCommandService (ISubscriptionRepository subscriptionRep
         
         return subscription;
     }
+
+    public async Task<Subscription?> Handle(CancelSubscriptionCommand command)
+    {
+        var subscription = await subscriptionRepository.FindActiveSubscriptionByUserIdAsync(command.UserId);
+        //verificamos que haya una suscripción con ese Id
+        if(subscription is null)
+        {
+            logger.LogWarning("No active subscription found for user {UserId} to cancel.", command.UserId);
+            return null;
+        }
+        
+        //cancelamos
+        try
+        {
+            subscription.Deactivate();
+            subscriptionRepository.Update(subscription);
+            await unitOfWork.CompleteAsync();
+            logger.LogInformation("Active subscription {SubscriptionId} cancelled for user {UserId}.", subscription.Id, command.UserId);
+        }catch(Exception e)
+        {
+            logger.LogError(e, "Error cancelling subscription for user {UserId}", command.UserId);
+            return null;
+        }
+
+        return subscription;
+    }
 }

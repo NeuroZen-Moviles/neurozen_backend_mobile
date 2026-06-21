@@ -8,6 +8,7 @@ using neurozen.API.Subscriptions.Interfaces.REST.Resources;
 using neurozen.API.Subscriptions.Interfaces.REST.Transform;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Security.Claims;
+using neurozen.API.Subscriptions.Domain.Model.Commands;
 
 namespace neurozen.API.Subscriptions.Interfaces;
 
@@ -56,8 +57,8 @@ public class SubscriptionsController(
             return BadRequest(new { message = msgEmailUser });
 
         String msgSubscriptionActive = _localizer.GetString("SubscriptionActiveError");
-        
-        
+
+
 
         // 🔹 Crear comando y procesar
         var createSubscriptionCommand = CreateSubscriptionCommandFromResourceAssembler.ToCommandFromResource(resource, userId);
@@ -119,5 +120,25 @@ public class SubscriptionsController(
             return NotFound(new { message = msg });
 
         return Ok(subscriptions.Select(SubscriptionResourceFromEntityAssembler.ToResourceFromEntity));
+    }
+
+    //PUT: cancelar suscripción
+    [HttpPut("cancel")]
+    [SwaggerOperation(Summary = "Cancel the logged-in user's active subscription")]
+    [SwaggerResponse(200, "Subscription cancelled", typeof(SubscriptionResource))]
+    [SwaggerResponse(404, "No active subscription found")]
+    public async Task<ActionResult> CancelSubscription()
+    {
+        var sidClaim = HttpContext.User.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/sid")?.Value
+                   ?? HttpContext.User.FindFirst(ClaimTypes.Sid)?.Value;
+
+        if (string.IsNullOrEmpty(sidClaim) || !Guid.TryParse(sidClaim, out var userId))
+            return Unauthorized(new { message = "No se pudo recuperar un UserId válido desde el token." });
+
+        var result = await subscriptionCommandService.Handle(new CancelSubscriptionCommand(userId));
+        if (result is null)
+            return NotFound(new { message = $"No active subscription for userId {userId}" });
+
+        return Ok(SubscriptionResourceFromEntityAssembler.ToResourceFromEntity(result));
     }
 }
