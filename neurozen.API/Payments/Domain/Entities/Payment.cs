@@ -1,11 +1,10 @@
 ﻿using System;
-using neurozen.API.Sales.Domain.Entities;
 
 namespace neurozen.API.Payments.Domain.Entities
 {
     public class Payment
     {
-        public Guid Id { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
 
         public Guid UserId { get; set; }
 

@@ -181,6 +181,10 @@ builder.Services.AddScoped<neurozen.API.Professionals.Domain.Services.IProfessio
 builder.Services.AddScoped<ITriggerRepository, TriggerRepository>();
 builder.Services.AddScoped<ITriggerCommandService, TriggerCommandService>();
 
+// Payments services
+builder.Services.AddScoped<neurozen.API.Payments.Domain.Repositories.IPaymentRepository, neurozen.API.Payments.Infrastructure.Repositories.PaymentRepository>();
+builder.Services.AddScoped<neurozen.API.Payments.Domain.Services.IPaymentQueryService, neurozen.API.Payments.Application.Internal.QueryService.PaymentQueryService>();
+
 // Subscriptions services
 builder.Services.AddScoped<ISubscriptionRepository, SubcriptionRepository>();
 builder.Services.AddScoped<ISubscriptionCommandService, SubscriptionCommandService>();
