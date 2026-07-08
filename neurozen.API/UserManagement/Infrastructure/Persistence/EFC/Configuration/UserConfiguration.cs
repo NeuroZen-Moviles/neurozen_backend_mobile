@@ -8,7 +8,10 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 {
     public void Configure(EntityTypeBuilder<User> builder)
     {
-        builder.ToTable("users");
+        builder.ToTable("users", table =>
+        {
+            table.HasCheckConstraint("CK_users_role_allowed", "`Role` IN ('patient','professional')");
+        });
         builder.HasKey(u => u.Id);
         builder.Property(u => u.Username).IsRequired().HasMaxLength(255);
         builder.HasIndex(u => u.Username).IsUnique();
@@ -17,7 +20,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
         builder.Property(u => u.PasswordHash).HasMaxLength(255);
         builder.Property(u => u.FullName).HasMaxLength(255);
-        builder.Property(u => u.Role).HasMaxLength(50).HasDefaultValue("user");
+        builder.Property(u => u.Role).IsRequired().HasMaxLength(20).HasDefaultValue("patient");
         builder.Property(u => u.AvatarUrl).HasColumnType("text");
         builder.Property(u => u.Meta).HasColumnType("json");
         builder.Property(u => u.CreatedAt).HasColumnType("datetime").HasDefaultValueSql("CURRENT_TIMESTAMP");

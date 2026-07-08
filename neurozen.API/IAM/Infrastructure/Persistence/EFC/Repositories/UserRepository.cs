@@ -32,7 +32,7 @@ public class UserRepository(AppDbContext context) : IUserRepository
             Email = entity.Email,
             PasswordHash = entity.PasswordHash,
             FullName = entity.Username,
-            Role = "user",
+            Role = "patient",
             AvatarUrl = null,
             Meta = "{}",
             CreatedAt = DateTimeOffset.UtcNow,

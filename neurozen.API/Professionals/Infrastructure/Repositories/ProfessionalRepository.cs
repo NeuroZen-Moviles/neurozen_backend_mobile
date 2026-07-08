@@ -12,4 +12,9 @@ public class ProfessionalRepository(AppDbContext context) : BaseRepository<Profe
     {
         return await context.Set<Professional>().ToListAsync();
     }
+
+    public async Task<bool> ExistsByUserIdAsync(Guid userId)
+    {
+        return await context.Set<Professional>().AnyAsync(p => p.UserId == userId);
+    }
 }
