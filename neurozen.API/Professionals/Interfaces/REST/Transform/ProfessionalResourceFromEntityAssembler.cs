@@ -7,7 +7,7 @@ public class ProfessionalResourceFromEntityAssembler
 {
   public static ProfessionalResource ToResourceFromEntity(Professional entity) => new(
     entity.Id,
-    entity.UserId,
+    //entity.UserId,
     entity.Name,
     entity.Email,
     entity.Specialty,
