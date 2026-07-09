@@ -17,7 +17,8 @@ namespace neurozen.API.Professionals.Interfaces.REST;
 public class ProfessionalsController(
   IProfessionalCommandService professionalCommandService,
   IProfessionalQueryService professionalQueryService,
-  IStringLocalizer<SharedResource> _localizer) : ControllerBase
+  IStringLocalizer<SharedResource> _localizer,
+  ILogger<ProfessionalsController> logger) : ControllerBase
 {
   [HttpGet]
   [SwaggerOperation(
@@ -46,11 +47,31 @@ public class ProfessionalsController(
   public async Task<ActionResult> CreateProfessional([FromBody] CreateProfessionalResource resource)
   {
     string msg = _localizer.GetString("CreateProfessionalError");
+    logger.LogInformation(
+      "Received request to create professional. Email: {Email}, Name: {Name}, Specialty: {Specialty}",
+      resource.Email,
+      resource.Name,
+      resource.Specialty);
+
     var createProfessionalCommand = CreateProfessionalCommandFromResourceAssembler.ToCommandFromResource(resource);
 
     var result = await professionalCommandService.Handle(createProfessionalCommand);
 
-    if (result is null) return BadRequest(new { message = msg });
+    if (result is null)
+    {
+      logger.LogWarning(
+        "Professional creation returned null. Email: {Email}, Name: {Name}, Specialty: {Specialty}",
+        resource.Email,
+        resource.Name,
+        resource.Specialty);
+      return BadRequest(new { message = msg });
+    }
+
+    logger.LogInformation(
+      "Professional creation succeeded. ProfessionalId: {ProfessionalId}, Email: {Email}",
+      result.Id,
+      resource.Email);
+
     return CreatedAtAction(nameof(GetProfessionalById), new { id = result.Id }, ProfessionalResourceFromEntityAssembler.ToResourceFromEntity(result));
   }
 

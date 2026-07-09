@@ -18,16 +18,36 @@ public class ProfessionalCommandService(
 {
   public async Task<Professional?> Handle(CreateProfessionalCommand command)
   {
+    logger.LogInformation(
+      "Starting professional creation. Email: {Email}, Name: {Name}, Specialty: {Specialty}, Rating: {Rating}, Reviews: {Reviews}, Price: {Price}",
+      command.Email,
+      command.Name,
+      command.Specialty,
+      command.Rating,
+      command.Reviews,
+      command.Price);
+
     var user = await dbContext.Set<User>().FirstOrDefaultAsync(u => u.Email == command.Email);
     if (user is null)
     {
-      logger.LogWarning("Cannot create professional profile because email does not exist");
+      logger.LogWarning(
+        "Cannot create professional profile because no user exists for email {Email}",
+        command.Email);
       return null;
     }
 
+    logger.LogInformation(
+      "Found linked user for professional creation. UserId: {UserId}, Email: {Email}, CurrentRole: {Role}",
+      user.Id,
+      user.Email,
+      user.Role);
+
     if (await professionalRepository.ExistsByIdAsync(user.Id))
     {
-      logger.LogWarning("Cannot create professional profile because one already exists for email {Email}", command.Email);
+      logger.LogWarning(
+        "Cannot create professional profile because one already exists for user {UserId} / email {Email}",
+        user.Id,
+        command.Email);
       return null;
     }
 
@@ -38,12 +58,27 @@ public class ProfessionalCommandService(
 
     try
     {
+      logger.LogInformation(
+        "Persisting professional entity. ProfessionalId: {ProfessionalId}, LinkedUserId: {UserId}",
+        professional.Id,
+        user.Id);
+
       await professionalRepository.AddAsync(professional);
       await unitOfWork.CompleteAsync();
+
+      logger.LogInformation(
+        "Professional created successfully. ProfessionalId: {ProfessionalId}, LinkedUserId: {UserId}",
+        professional.Id,
+        user.Id);
     }
     catch (Exception e)
     {
-      logger.LogError(e, "Error creating professional");
+      logger.LogError(
+        e,
+        "Error creating professional. Email: {Email}, UserId: {UserId}, ProfessionalId: {ProfessionalId}",
+        command.Email,
+        user.Id,
+        professional.Id);
       return null;
     }
     return professional;
