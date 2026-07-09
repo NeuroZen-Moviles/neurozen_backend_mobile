@@ -17,18 +17,13 @@ public class ProfessionalCommandService(
 {
   public async Task<Professional?> Handle(CreateProfessionalCommand command)
   {
-    var user = await dbContext.Set<User>().FindAsync(command.UserId);
+    var user = await dbContext.Set<User>().FindAsync(command.Email);
     if (user is null)
     {
-      logger.LogWarning("Cannot create professional profile because user {UserId} does not exist", command.UserId);
+      logger.LogWarning("Cannot create professional profile because email does not exist");
       return null;
     }
 
-    if (await professionalRepository.ExistsByUserIdAsync(command.UserId))
-    {
-      logger.LogWarning("Cannot create professional profile because one already exists for user {UserId}", command.UserId);
-      return null;
-    }
 
     var professional = new Professional(command);
     user.Role = "professional";
