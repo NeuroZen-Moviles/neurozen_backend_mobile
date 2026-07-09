@@ -15,8 +15,9 @@ namespace neurozen.API.Migrations
                 name: "FK_Professionals_users_UserId",
                 table: "Professionals");
 
-            migrationBuilder.Sql("DROP INDEX IF EXISTS `IX_Professionals_UserId` ON `Professionals`;");
-            migrationBuilder.Sql("DROP INDEX IF EXISTS `UX_Professionals_UserId` ON `Professionals`;");
+            migrationBuilder.DropIndex(
+                name: "UX_Professionals_UserId",
+                table: "Professionals");
 
             migrationBuilder.DropColumn(
                 name: "UserId",
