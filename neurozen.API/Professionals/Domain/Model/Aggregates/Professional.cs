@@ -9,9 +9,6 @@ public partial class Professional
     public Professional(CreateProfessionalCommand command)
     {
         // Validaciones de negocio
-        //if (command.UserId == Guid.Empty)
-            //throw new ArgumentException("UserId cannot be empty", nameof(command.UserId));
-
         if (string.IsNullOrWhiteSpace(command.Name))
             throw new ArgumentException("Name cannot be empty", nameof(command.Name));
 
@@ -34,7 +31,6 @@ public partial class Professional
 
         if (!command.Email.Contains('@') || !command.Email.Contains(".com")) throw new ArgumentException("Invalid email", nameof(command.Email));
 
-        //UserId = command.UserId;
         Name = command.Name;
         Email = command.Email;
         Specialty = command.Specialty;
@@ -47,8 +43,15 @@ public partial class Professional
         Image = command.Image;
     }
 
+    public void AssignUserIdAsProfessionalId(Guid userId)
+    {
+        if (userId == Guid.Empty)
+            throw new ArgumentException("User id cannot be empty", nameof(userId));
+
+        Id = userId;
+    }
+
     public Guid Id { get; private set; } = Guid.NewGuid();
-    //public Guid UserId { get; private set; } //esto no va
     public string Email { get; private set; } = string.Empty;
     public string Name { get; private set; } = string.Empty;
     public string Specialty { get; private set; } = string.Empty;

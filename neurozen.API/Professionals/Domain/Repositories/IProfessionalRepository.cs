@@ -12,9 +12,9 @@ public interface IProfessionalRepository : IBaseRepository<Professional>
     Task<IEnumerable<Professional>> GetAllProfessionals();
 
     /// <summary>
-    ///     Checks whether a professional profile already exists for the given user id.
+    ///     Checks whether a professional profile already exists for the given id.
     /// </summary>
-    /// <param name="userId">The user id to check.</param>
+    /// <param name="id">The id to check.</param>
     /// <returns>True if a profile exists, otherwise false.</returns>
-    Task<bool> ExistsByUserIdAsync(Guid userId);
+    Task<bool> ExistsByIdAsync(Guid id);
 }

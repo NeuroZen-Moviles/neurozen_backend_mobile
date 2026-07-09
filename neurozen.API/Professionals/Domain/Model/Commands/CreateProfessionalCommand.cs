@@ -1,7 +1,6 @@
 namespace neurozen.API.Professionals.Domain.Model.Commands;
 
 public record CreateProfessionalCommand(
-    //Guid UserId,
     string Name,
     string Email,
     string Specialty,

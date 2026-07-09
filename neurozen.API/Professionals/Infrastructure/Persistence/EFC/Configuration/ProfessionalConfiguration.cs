@@ -18,18 +18,10 @@ public class ProfessionalConfiguration : IEntityTypeConfiguration<Professional>
             .HasColumnType("char(36)")
             .ValueGeneratedNever();
 
-        // User Id
-        builder.Property(p => p.UserId)
-            .IsRequired()
-            .HasColumnName("UserId")
-            .HasColumnType("char(36)");
-
-        builder.HasIndex(p => p.UserId)
-            .IsUnique();
-
+        // Shared key one-to-one: professional uses the same Id as the linked user.
         builder.HasOne<User>()
             .WithMany()
-            .HasForeignKey(p => p.UserId)
+            .HasForeignKey("Id")
             .HasPrincipalKey(u => u.Id)
             .OnDelete(DeleteBehavior.Cascade);
 
