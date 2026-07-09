@@ -12,8 +12,8 @@ using neurozen.API.Shared.Infrastructure.Persistence.EFC.Configuration;
 namespace neurozen.API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260515043638_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260709193032_BaselineActual")]
+    partial class BaselineActual
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,12 +27,9 @@ namespace neurozen.API.Migrations
 
             modelBuilder.Entity("neurozen.API.Appointments.Domain.Model.Aggregates.Appointment", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)")
                         .HasColumnName("id");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("AppointmentDateTime")
                         .HasColumnType("datetime(6)")
@@ -47,12 +44,12 @@ namespace neurozen.API.Migrations
                         .HasColumnType("varchar(2000)")
                         .HasColumnName("notas_adicionales");
 
-                    b.Property<long>("PatientId")
-                        .HasColumnType("bigint")
+                    b.Property<Guid>("PatientId")
+                        .HasColumnType("char(36)")
                         .HasColumnName("patient_id");
 
-                    b.Property<long>("ProfessionalId")
-                        .HasColumnType("bigint")
+                    b.Property<Guid>("ProfessionalId")
+                        .HasColumnType("char(36)")
                         .HasColumnName("professional_id");
 
                     b.HasKey("Id");
@@ -121,72 +118,50 @@ namespace neurozen.API.Migrations
                         .HasColumnType("char(36)");
 
                     b.Property<bool>("Active")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("tinyint(1)")
-                        .HasDefaultValue(true);
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<Guid?>("CategoryId")
                         .HasColumnType("char(36)");
 
                     b.Property<DateTimeOffset>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("Currency")
                         .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(10)
-                        .HasColumnType("varchar(10)")
-                        .HasDefaultValue("USD");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Description")
-                        .HasColumnType("text");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Metadata")
                         .IsRequired()
-                        .HasColumnType("json");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("varchar(255)");
+                        .HasColumnType("longtext");
 
                     b.Property<decimal>("Price")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("numeric(10,2)")
-                        .HasDefaultValue(0m);
+                        .HasColumnType("decimal(65,30)");
 
                     b.Property<string>("Sku")
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Slug")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("varchar(255)");
+                        .HasColumnType("longtext");
 
                     b.Property<int>("Stock")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasDefaultValue(0);
+                        .HasColumnType("int");
 
                     b.Property<DateTimeOffset>("UpdatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP");
+                        .HasColumnType("datetime(6)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
 
-                    b.HasIndex("Sku")
-                        .IsUnique();
-
-                    b.HasIndex("Slug")
-                        .IsUnique();
-
-                    b.ToTable("products", (string)null);
+                    b.ToTable("Product");
                 });
 
             modelBuilder.Entity("neurozen.API.Catalog.Domain.Entities.ProductImage", b =>
@@ -196,91 +171,40 @@ namespace neurozen.API.Migrations
                         .HasColumnType("char(36)");
 
                     b.Property<string>("Alt")
-                        .HasColumnType("text");
+                        .HasColumnType("longtext");
 
                     b.Property<int>("Position")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasDefaultValue(0);
+                        .HasColumnType("int");
 
                     b.Property<Guid>("ProductId")
                         .HasColumnType("char(36)");
 
                     b.Property<string>("Url")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("product_images", (string)null);
-                });
-
-            modelBuilder.Entity("neurozen.API.IAM.Domain.Model.Aggregates.User", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Address")
-                        .HasMaxLength(500)
-                        .HasColumnType("varchar(500)");
-
-                    b.Property<string>("AvatarUrl")
-                        .HasMaxLength(500)
-                        .HasColumnType("varchar(500)");
-
-                    b.Property<DateTime?>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
-
-                    b.Property<DateTime?>("DateOfBirth")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("Email")
-                        .HasMaxLength(255)
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("FullName")
-                        .HasMaxLength(255)
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("PasswordHash")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlComputedColumn(b.Property<DateTime?>("UpdatedAt"));
-
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("users", (string)null);
+                    b.ToTable("ProductImage");
                 });
 
             modelBuilder.Entity("neurozen.API.Payments.Domain.Entities.Payment", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
                     b.Property<decimal>("Amount")
                         .HasColumnType("numeric(12,2)");
+
+                    b.Property<string>("CardBrand")
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<string>("CardLast4")
+                        .HasMaxLength(4)
+                        .HasColumnType("varchar(4)");
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -288,38 +212,50 @@ namespace neurozen.API.Migrations
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<string>("Currency")
+                        .IsRequired()
                         .HasMaxLength(10)
                         .HasColumnType("varchar(10)");
 
                     b.Property<Guid?>("OrderId")
                         .HasColumnType("char(36)");
 
+                    b.Property<int>("PlanId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Provider")
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
 
-                    b.Property<string>("ProviderResponse")
-                        .HasColumnType("json");
+                    b.Property<string>("ProviderRef")
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("Status")
+                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("varchar(50)");
+
+                    b.Property<Guid?>("SubscriptionId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("OrderId");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("IX_payments_UserId");
 
                     b.ToTable("payments", (string)null);
                 });
 
             modelBuilder.Entity("neurozen.API.Professionals.Domain.Model.Aggregates.Professional", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)")
                         .HasColumnName("Id");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Availability")
                         .IsRequired()
@@ -331,6 +267,12 @@ namespace neurozen.API.Migrations
                         .IsRequired()
                         .HasColumnType("longtext")
                         .HasColumnName("Bio");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("Email");
 
                     b.Property<string>("Experience")
                         .IsRequired()
@@ -367,19 +309,23 @@ namespace neurozen.API.Migrations
                         .HasColumnType("varchar(255)")
                         .HasColumnName("Specialty");
 
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("UserId");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
 
                     b.ToTable("Professionals", (string)null);
                 });
 
             modelBuilder.Entity("neurozen.API.ResourcesLibrary.Domain.Model.Aggregates.ResourceLibrary", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)")
                         .HasColumnName("id");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Author")
                         .IsRequired()
@@ -433,31 +379,26 @@ namespace neurozen.API.Migrations
                         .HasColumnType("char(36)");
 
                     b.Property<DateTimeOffset>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("Metadata")
                         .IsRequired()
-                        .HasColumnType("json");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("SessionId")
-                        .HasMaxLength(255)
-                        .HasColumnType("varchar(255)");
+                        .HasColumnType("longtext");
 
                     b.Property<DateTimeOffset>("UpdatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP");
+                        .HasColumnType("datetime(6)");
 
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("char(36)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("carts", (string)null);
+                    b.ToTable("Cart");
                 });
 
             modelBuilder.Entity("neurozen.API.Sales.Domain.Entities.CartItem", b =>
@@ -471,18 +412,16 @@ namespace neurozen.API.Migrations
 
                     b.Property<string>("Metadata")
                         .IsRequired()
-                        .HasColumnType("json");
+                        .HasColumnType("longtext");
 
                     b.Property<Guid?>("ProductId")
                         .HasColumnType("char(36)");
 
                     b.Property<int>("Quantity")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasDefaultValue(1);
+                        .HasColumnType("int");
 
                     b.Property<decimal>("UnitPrice")
-                        .HasColumnType("numeric(10,2)");
+                        .HasColumnType("decimal(65,30)");
 
                     b.HasKey("Id");
 
@@ -490,7 +429,7 @@ namespace neurozen.API.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("cart_items", (string)null);
+                    b.ToTable("CartItem");
                 });
 
             modelBuilder.Entity("neurozen.API.Sales.Domain.Entities.Order", b =>
@@ -503,46 +442,34 @@ namespace neurozen.API.Migrations
                         .HasColumnType("char(36)");
 
                     b.Property<DateTimeOffset>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("Currency")
                         .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(10)
-                        .HasColumnType("varchar(10)")
-                        .HasDefaultValue("USD");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Metadata")
                         .IsRequired()
-                        .HasColumnType("json");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("PaymentInfo")
-                        .HasColumnType("json");
+                        .HasColumnType("longtext");
 
                     b.Property<Guid?>("ShippingAddressId")
                         .HasColumnType("char(36)");
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)")
-                        .HasDefaultValue("pending");
+                        .HasColumnType("longtext");
 
                     b.Property<decimal>("Total")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("numeric(12,2)")
-                        .HasDefaultValue(0m);
+                        .HasColumnType("decimal(65,30)");
 
                     b.Property<DateTimeOffset>("UpdatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP");
+                        .HasColumnType("datetime(6)");
 
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("char(36)");
 
                     b.HasKey("Id");
 
@@ -552,7 +479,7 @@ namespace neurozen.API.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("orders", (string)null);
+                    b.ToTable("Order");
                 });
 
             modelBuilder.Entity("neurozen.API.Sales.Domain.Entities.OrderItem", b =>
@@ -563,11 +490,10 @@ namespace neurozen.API.Migrations
 
                     b.Property<string>("Metadata")
                         .IsRequired()
-                        .HasColumnType("json");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(255)
-                        .HasColumnType("varchar(255)");
+                        .HasColumnType("longtext");
 
                     b.Property<Guid>("OrderId")
                         .HasColumnType("char(36)");
@@ -576,24 +502,19 @@ namespace neurozen.API.Migrations
                         .HasColumnType("char(36)");
 
                     b.Property<int>("Quantity")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasDefaultValue(1);
+                        .HasColumnType("int");
 
                     b.Property<string>("Sku")
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
+                        .HasColumnType("longtext");
 
                     b.Property<decimal>("UnitPrice")
-                        .HasColumnType("numeric(10,2)");
+                        .HasColumnType("decimal(65,30)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("OrderId");
 
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("order_items", (string)null);
+                    b.ToTable("OrderItem");
                 });
 
             modelBuilder.Entity("neurozen.API.Shared.Domain.Entities.AppSetting", b =>
@@ -617,12 +538,9 @@ namespace neurozen.API.Migrations
 
             modelBuilder.Entity("neurozen.API.Subscriptions.Domain.Model.Aggregates.Subscription", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)")
                         .HasColumnName("Id");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Cvv")
                         .IsRequired()
@@ -664,8 +582,8 @@ namespace neurozen.API.Migrations
                         .HasColumnType("int")
                         .HasColumnName("PlanId");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int")
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)")
                         .HasColumnName("UserId");
 
                     b.HasKey("Id");
@@ -696,12 +614,10 @@ namespace neurozen.API.Migrations
 
             modelBuilder.Entity("neurozen.API.Triggers.Domain.Model.Aggregates.Trigger", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                        .HasColumnType("char(36)")
                         .HasColumnName("id");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("CategoryId")
                         .HasColumnType("int")
@@ -780,8 +696,8 @@ namespace neurozen.API.Migrations
                     b.Property<string>("Street")
                         .HasColumnType("longtext");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)");
 
                     b.HasKey("Id");
 
@@ -821,8 +737,8 @@ namespace neurozen.API.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)");
 
                     b.HasKey("Id");
 
@@ -857,8 +773,8 @@ namespace neurozen.API.Migrations
                     b.Property<string>("UserAgent")
                         .HasColumnType("text");
 
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("char(36)");
 
                     b.HasKey("Id");
 
@@ -868,6 +784,68 @@ namespace neurozen.API.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("sessions", (string)null);
+                });
+
+            modelBuilder.Entity("neurozen.API.UserManagement.Domain.Entities.User", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("AvatarUrl")
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("FullName")
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("Meta")
+                        .IsRequired()
+                        .HasColumnType("json");
+
+                    b.Property<string>("PasswordHash")
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
+                        .HasDefaultValue("patient");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.HasIndex("Username")
+                        .IsUnique();
+
+                    b.ToTable("users", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_users_role_allowed", "`Role` IN ('patient','professional')");
+                        });
                 });
 
             modelBuilder.Entity("neurozen.API.Catalog.Domain.Entities.Category", b =>
@@ -884,8 +862,7 @@ namespace neurozen.API.Migrations
                 {
                     b.HasOne("neurozen.API.Catalog.Domain.Entities.Category", "Category")
                         .WithMany("Products")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .HasForeignKey("CategoryId");
 
                     b.Navigation("Category");
                 });
@@ -903,20 +880,25 @@ namespace neurozen.API.Migrations
 
             modelBuilder.Entity("neurozen.API.Payments.Domain.Entities.Payment", b =>
                 {
-                    b.HasOne("neurozen.API.Sales.Domain.Entities.Order", "Order")
+                    b.HasOne("neurozen.API.Sales.Domain.Entities.Order", null)
                         .WithMany("Payments")
-                        .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .HasForeignKey("OrderId");
+                });
 
-                    b.Navigation("Order");
+            modelBuilder.Entity("neurozen.API.Professionals.Domain.Model.Aggregates.Professional", b =>
+                {
+                    b.HasOne("neurozen.API.UserManagement.Domain.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("neurozen.API.Sales.Domain.Entities.Cart", b =>
                 {
-                    b.HasOne("neurozen.API.IAM.Domain.Model.Aggregates.User", "User")
+                    b.HasOne("neurozen.API.UserManagement.Domain.Entities.User", "User")
                         .WithMany("Carts")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .HasForeignKey("UserId");
 
                     b.Navigation("User");
                 });
@@ -931,8 +913,7 @@ namespace neurozen.API.Migrations
 
                     b.HasOne("neurozen.API.Catalog.Domain.Entities.Product", "Product")
                         .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .HasForeignKey("ProductId");
 
                     b.Navigation("Cart");
 
@@ -943,18 +924,15 @@ namespace neurozen.API.Migrations
                 {
                     b.HasOne("neurozen.API.UserManagement.Domain.Entities.Address", "BillingAddress")
                         .WithMany()
-                        .HasForeignKey("BillingAddressId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .HasForeignKey("BillingAddressId");
 
                     b.HasOne("neurozen.API.UserManagement.Domain.Entities.Address", "ShippingAddress")
                         .WithMany()
-                        .HasForeignKey("ShippingAddressId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .HasForeignKey("ShippingAddressId");
 
-                    b.HasOne("neurozen.API.IAM.Domain.Model.Aggregates.User", "User")
+                    b.HasOne("neurozen.API.UserManagement.Domain.Entities.User", "User")
                         .WithMany("Orders")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .HasForeignKey("UserId");
 
                     b.Navigation("BillingAddress");
 
@@ -971,17 +949,12 @@ namespace neurozen.API.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("neurozen.API.Sales.Domain.Entities.Order", null)
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
                     b.Navigation("Order");
                 });
 
             modelBuilder.Entity("neurozen.API.UserManagement.Domain.Entities.Address", b =>
                 {
-                    b.HasOne("neurozen.API.IAM.Domain.Model.Aggregates.User", "User")
+                    b.HasOne("neurozen.API.UserManagement.Domain.Entities.User", "User")
                         .WithMany("Addresses")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -992,7 +965,7 @@ namespace neurozen.API.Migrations
 
             modelBuilder.Entity("neurozen.API.UserManagement.Domain.Entities.Notification", b =>
                 {
-                    b.HasOne("neurozen.API.IAM.Domain.Model.Aggregates.User", "User")
+                    b.HasOne("neurozen.API.UserManagement.Domain.Entities.User", "User")
                         .WithMany("Notifications")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1003,7 +976,7 @@ namespace neurozen.API.Migrations
 
             modelBuilder.Entity("neurozen.API.UserManagement.Domain.Entities.Session", b =>
                 {
-                    b.HasOne("neurozen.API.IAM.Domain.Model.Aggregates.User", "User")
+                    b.HasOne("neurozen.API.UserManagement.Domain.Entities.User", "User")
                         .WithMany("Sessions")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -1023,19 +996,6 @@ namespace neurozen.API.Migrations
                     b.Navigation("Images");
                 });
 
-            modelBuilder.Entity("neurozen.API.IAM.Domain.Model.Aggregates.User", b =>
-                {
-                    b.Navigation("Addresses");
-
-                    b.Navigation("Carts");
-
-                    b.Navigation("Notifications");
-
-                    b.Navigation("Orders");
-
-                    b.Navigation("Sessions");
-                });
-
             modelBuilder.Entity("neurozen.API.Sales.Domain.Entities.Cart", b =>
                 {
                     b.Navigation("Items");
@@ -1046,6 +1006,19 @@ namespace neurozen.API.Migrations
                     b.Navigation("Items");
 
                     b.Navigation("Payments");
+                });
+
+            modelBuilder.Entity("neurozen.API.UserManagement.Domain.Entities.User", b =>
+                {
+                    b.Navigation("Addresses");
+
+                    b.Navigation("Carts");
+
+                    b.Navigation("Notifications");
+
+                    b.Navigation("Orders");
+
+                    b.Navigation("Sessions");
                 });
 #pragma warning restore 612, 618
         }

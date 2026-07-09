@@ -199,8 +199,14 @@ var app = builder.Build();
 
 // Apply pending EF Core migrations on startup so deployed environments receive
 // schema changes such as new columns and constraints.
-using (var scope = app.Services.CreateScope())
+// Keep this opt-in for production so existing databases without EF history do
+// not fail the entire deployment on startup.
+var applyMigrationsOnStartup = app.Environment.IsDevelopment() ||
+    string.Equals(Environment.GetEnvironmentVariable("APPLY_MIGRATIONS_ON_STARTUP"), "true", StringComparison.OrdinalIgnoreCase);
+
+if (applyMigrationsOnStartup)
 {
+    using var scope = app.Services.CreateScope();
     var services = scope.ServiceProvider;
     var context = services.GetRequiredService<AppDbContext>();
     context.Database.Migrate();
