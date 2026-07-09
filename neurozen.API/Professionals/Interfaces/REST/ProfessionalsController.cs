@@ -57,22 +57,27 @@ public class ProfessionalsController(
 
     var result = await professionalCommandService.Handle(createProfessionalCommand);
 
-    if (result is null)
+    if (!result.Succeeded)
     {
       logger.LogWarning(
-        "Professional creation returned null. Email: {Email}, Name: {Name}, Specialty: {Specialty}",
+        "Professional creation failed. StatusCode: {StatusCode}, Message: {Message}, Email: {Email}, Name: {Name}, Specialty: {Specialty}",
+        result.StatusCode,
+        result.Message,
         resource.Email,
         resource.Name,
         resource.Specialty);
-      return BadRequest(new { message = msg });
+      return StatusCode(result.StatusCode, new { message = string.IsNullOrWhiteSpace(result.Message) ? msg : result.Message });
     }
 
     logger.LogInformation(
       "Professional creation succeeded. ProfessionalId: {ProfessionalId}, Email: {Email}",
-      result.Id,
+      result.Professional!.Id,
       resource.Email);
 
-    return CreatedAtAction(nameof(GetProfessionalById), new { id = result.Id }, ProfessionalResourceFromEntityAssembler.ToResourceFromEntity(result));
+    return CreatedAtAction(
+      nameof(GetProfessionalById),
+      new { id = result.Professional.Id },
+      ProfessionalResourceFromEntityAssembler.ToResourceFromEntity(result.Professional));
   }
 
   [HttpGet("{id:guid}")]

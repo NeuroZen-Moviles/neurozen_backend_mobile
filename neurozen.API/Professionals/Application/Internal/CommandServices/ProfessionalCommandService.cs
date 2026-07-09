@@ -1,5 +1,6 @@
 using neurozen.API.Professionals.Domain.Model.Aggregates;
 using neurozen.API.Professionals.Domain.Model.Commands;
+using neurozen.API.Professionals.Domain.Model.Results;
 using neurozen.API.Professionals.Domain.Repositories;
 using neurozen.API.Professionals.Domain.Services;
 using neurozen.API.Shared.Domain.Repositories;
@@ -16,7 +17,7 @@ public class ProfessionalCommandService(
   ILogger<ProfessionalCommandService> logger
 ) : IProfessionalCommandService
 {
-  public async Task<Professional?> Handle(CreateProfessionalCommand command)
+  public async Task<ProfessionalCreationResult> Handle(CreateProfessionalCommand command)
   {
     logger.LogInformation(
       "Starting professional creation. Email: {Email}, Name: {Name}, Specialty: {Specialty}, Rating: {Rating}, Reviews: {Reviews}, Price: {Price}",
@@ -33,7 +34,8 @@ public class ProfessionalCommandService(
       logger.LogWarning(
         "Cannot create professional profile because no user exists for email {Email}",
         command.Email);
-      return null;
+      return ProfessionalCreationResult.NotFound(
+        $"No existe un usuario registrado con el email '{command.Email}'. Primero debes crear la cuenta en IAM/sign-up.");
     }
 
     logger.LogInformation(
@@ -48,7 +50,8 @@ public class ProfessionalCommandService(
         "Cannot create professional profile because one already exists for user {UserId} / email {Email}",
         user.Id,
         command.Email);
-      return null;
+      return ProfessionalCreationResult.Conflict(
+        $"Ya existe un perfil de profesional para el usuario '{command.Email}'.");
     }
 
 
@@ -70,6 +73,8 @@ public class ProfessionalCommandService(
         "Professional created successfully. ProfessionalId: {ProfessionalId}, LinkedUserId: {UserId}",
         professional.Id,
         user.Id);
+
+      return ProfessionalCreationResult.Success(professional);
     }
     catch (Exception e)
     {
@@ -79,8 +84,8 @@ public class ProfessionalCommandService(
         command.Email,
         user.Id,
         professional.Id);
-      return null;
+      return ProfessionalCreationResult.BadRequest(
+        "Ocurrió un error inesperado al crear el profesional. Revisa los logs del servidor.");
     }
-    return professional;
   }
 }
