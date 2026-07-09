@@ -197,12 +197,13 @@ builder.Services.AddScoped<neurozen.API.ResourcesLibrary.Application.Internal.Qu
 
 var app = builder.Build();
 
-// Verify Database Objects are created
+// Apply pending EF Core migrations on startup so deployed environments receive
+// schema changes such as new columns and constraints.
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     var context = services.GetRequiredService<AppDbContext>();
-    context.Database.EnsureCreated();
+    context.Database.Migrate();
 }
 app.UseRequestLocalization(LocalizationOptions);
 app.UseHttpsRedirection();
